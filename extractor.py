@@ -4,6 +4,8 @@ import matplotlib.pyplot as plt#
 import seaborn
 import numpy as np
 import subprocess
+from variables import ANNOTATIONS_PATH
+import json
 
 # Load audio
 signal, sr = librosa.load("audio.wav", sr=22050)
@@ -23,6 +25,14 @@ x = range(len(zcr))
 seaborn.lineplot(x=x, y=zcr)
 plt.show()
 
+
+'''
+Features by Alqudah:
+zero crossing rate, energy entropy, short time energy, spectral rolloff, spectral centroid and spectral flux
+
+SMILExtract -C "opensmile/alqudah.conf" -I "audio/1s.wav" -O "out.csv"
+'''
+
 def extractAudioFeatures(audio_path, config_path, output_path):
     subprocess.call(
         ["SMILExtract", "-C", config_path,
@@ -33,12 +43,18 @@ def extractAudioFeatures(audio_path, config_path, output_path):
         ]
     )
 
-'''
-Features by Alqudah:
-zero crossing rate, energy entropy, short time energy, spectral rolloff, spectral centroid and spectral flux
-
-SMILExtract -C "opensmile/alqudah.conf" -I "audio/1s.wav" -O "out.csv"
-'''
+def buildJSON():
+    obj = {}
+    data = list()
+    dataobj = {}
+    dataobj["class"] = 0
+    dataobj["label"] = 0
+    dataobj["features"] = []
+    data.append()
+    obj.append("data": data)
+    objstr = json.dumps(obj)
+    with open(ANNOTATIONS_PATH, "w") as f:
+        f.write(objstr)
 
 if __name__ == "__main__":
     pass
