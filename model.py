@@ -10,14 +10,15 @@ import cv2
 import json
 from variables import ANNOTATIONS_PATH
 
+
 def loadData():
     with open(ANNOTATIONS_PATH) as f:
-        annotations = json.loads(f)
+        annotations = json.load(f)
     
     features = list()
     labels = list()
     for data in annotations["data"]:
-        labels.append([data["class"],data["side"]])
+        labels.append(data["label"])
         features.append(data["features"])
 
     return np.array(features), np.array(labels)
@@ -33,30 +34,28 @@ def plot_loss(history):
     plt.grid(True)
     plt.show()
 
-
-def train(csv, model_name):
+def train(model_name):
     '''
     Returns the model trained on a provided dataset (.csv)
     '''
-    features = loadData()
+    features, labels = loadData()
+    print(features.shape)
 
     # Data normalizer
-    normalizer = preprocessing.Normalization()
-    normalizer.adapt(np.array(features))
+    normalizer = preprocessing.Normalization(axis=1)
+    normalizer.adapt(features)
 
     # Visualize normalization effect
-    # with np.printoptions(precision=2, suppress=True):
-    #     print('First example:', np.array(df[:1]))
-    #     print('Normalized:', normalizer(np.array(df[:1])).numpy())
-
+    print('First row of features (before norm):', features[0])
+    print('Normalized:', normalizer(np.array([features[0]])))
 
     # Train the regression
     model = tf.keras.Sequential([
+        layers.Flatten(input_shape=(1, features.shape[1])),
         # When the layer is called it returns the input data, with each feature independently normalized
         normalizer,
-        layers.Dense(32, activation="relu")
-        layers.Dense(2, activation="softmax")   # 2 output units: class, direction
-
+        # layers.Dense(32, activation="relu")
+        layers.Dense(3, activation="softmax")   # 3 classes: no rumble, left rumble, right rumble
     ])
 
     # Configure the trainng procedure
@@ -67,15 +66,15 @@ def train(csv, model_name):
     )
 
     # Get a print-out summary of the model
-    # model.summary()
+    model.summary()
     
     # Train and save the history (training process)
     history = model.fit(
         features, labels,
-        epochs=100, 
-        verbose = 1, # 0 to suppress logging
-        # Calculate validation results on 20% of the training data
-        validation_split = 0.2
+        epochs = 50, 
+        verbose = 1,                # 0 to suppress logging
+        validation_split = 0.2,      # Calculate validation results on 20% of the training data
+        batch_size = 1
     )
     print("Training Complete!\n")
 
@@ -95,6 +94,9 @@ def train(csv, model_name):
     # test_features['Horsepower'],
     # test_labels, verbose=0)
 
-
     # Save the model for documentation and later testing
     model.save(model_name)
+
+
+if __name__ == "__main__":
+    train("trained_model")
