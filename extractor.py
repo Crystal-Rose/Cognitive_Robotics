@@ -11,7 +11,7 @@ zero crossing rate, energy entropy, short time energy, spectral rolloff, spectra
 SMILExtract -C "opensmile/alqudah.conf" -I "audio/1s.wav" -O "out.csv"
 '''
 
-def extractAudioFeatures(audio_path, output_path, config_path="opensmile/alqudah.conf"):
+def extractAudioFeatures(audio_path, output_path, config_path="conf/alqudah.conf"):
     subprocess.call(
         ["SMILExtract", "-C", config_path,
             "-I", audio_path,
@@ -142,9 +142,11 @@ def buildJSON(meanEachSide=True, concatenateSides=True):
         f.write(objstr)
 
 if __name__ == "__main__":
+    # extractAudioFeatures("audio/1s.wav", "0.cvs")
+
     ## 2 stages that are started separately:
     ## 1st: extract csv files with OpenSMILE
     # extractForAllFiles()
 
     ## 2nd: generate a JSON file
-    buildJSON()
+    # buildJSON()

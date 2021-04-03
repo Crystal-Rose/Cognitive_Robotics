@@ -1,0 +1,9 @@
+# python packages
+tensorflow2
+PyAudio (sudo apt install python3-pyaudio)
+numpy
+matplotlib
+audiofile
+
+# other software:
+OpenSmile
